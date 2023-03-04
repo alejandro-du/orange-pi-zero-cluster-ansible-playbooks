@@ -1,0 +1,8 @@
+- name: Checks the temperature of each node
+  hosts: opiesz
+  gather_facts: no
+  tasks:
+    - name: Print temperature
+      shell: echo "$(($(cat /sys/class/thermal/thermal_zone0/temp) / 1000)) °C"
+      register: output
+    - debug: var=output.stdout

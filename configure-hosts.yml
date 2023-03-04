@@ -1,0 +1,11 @@
+- hosts: opiesz
+  become: true
+  tasks:
+    - name: Configure LED activity
+      shell: sed '$iecho activity > /sys/class/leds/red\:power/trigger' /etc/rc.local > temp && mv temp /etc/rc.local && chmod +x /etc/rc.local
+
+    - name: Set hostname
+      shell: hostnamectl set-hostname {{ hostname }}
+      
+    - name: Install Avahi
+      shell: apt-get install avahi-daemon -y

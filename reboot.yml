@@ -1,0 +1,9 @@
+- name: Reboot nodes
+  hosts: opiesz
+  tasks:
+    - name: Reboot
+      become: yes
+      reboot:
+        reboot_timeout: 200
+      ignore_errors: yes
+      ignore_unreachable: yes

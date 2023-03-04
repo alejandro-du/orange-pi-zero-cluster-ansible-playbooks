@@ -1,0 +1,5 @@
+- name: Ping the nodes
+  gather_facts: no
+  hosts: opiesz
+  tasks:
+  - action: ping

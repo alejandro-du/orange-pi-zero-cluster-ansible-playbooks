@@ -8,10 +8,10 @@ Install Ansible on a control node and define an inventory (**/etc/ansible/hosts*
 
 ```
 [opiesz]
-192.168.1.101		ansible_user=root		hostname=ozpi01
-192.168.1.102		ansible_user=root		hostname=ozpi02
-192.168.1.103		ansible_user=root		hostname=ozpi03
-192.168.1.104		ansible_user=root		hostname=ozpi04
+192.168.1.101		ansible_user=orangepi		hostname=ozpi01
+192.168.1.102		ansible_user=orangepi		hostname=ozpi02
+192.168.1.103		ansible_user=orangepi		hostname=ozpi03
+192.168.1.104		ansible_user=orangepi		hostname=ozpi04
 
 Run a playbook as follows:
 

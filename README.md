@@ -1,6 +1,6 @@
 # Ansible playbooks to manage Orange Pi Zero 2 clusters
 
-This repository contains a set of Ansible playbooks that help to set up and manage a Orange Pi Zero 2 cluster.
+This repository contains a set of Ansible playbooks that help to set up and manage an Orange Pi Zero 2 cluster.
 
 ## How to run?
 

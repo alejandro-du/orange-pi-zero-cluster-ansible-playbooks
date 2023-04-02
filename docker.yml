@@ -4,6 +4,9 @@
     - name: Switch to iptables for nat
       shell: update-alternatives --set iptables /usr/sbin/iptables-legacy
 
+    - name: Configure cgroup
+      shell: echo 'extraargs="systemd.unified_cgroup_hierarchy=0"' >> /boot/armbianEnv.txt
+
     - name: Switch to iptables for nat (ip6)
       shell: sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 

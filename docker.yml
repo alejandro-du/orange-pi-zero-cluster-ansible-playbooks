@@ -1,0 +1,13 @@
+- hosts: opiesz
+  become: true
+  tasks:
+    - name: Switch to iptables for nat
+      shell: update-alternatives --set iptables /usr/sbin/iptables-legacy
+
+    - name: Switch to iptables for nat (ip6)
+      shell: sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+
+    - name: Install Docker
+      apt:
+        pkg:
+          - docker.io

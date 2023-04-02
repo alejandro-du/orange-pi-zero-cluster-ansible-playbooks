@@ -1,0 +1,31 @@
+- hosts: opiesz
+  become: true
+  tasks:
+    - name: Switch to iptables for nat
+      shell: update-alternatives --set iptables /usr/sbin/iptables-legacy
+
+    - name: Switch to iptables for nat (ip6)
+      shell: sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+
+    - name: Install Docker
+      apt:
+        pkg:
+          - docker.io
+
+- hosts: opiesz_manager
+  become: true
+  tasks:
+    - name: Init swarm cluster
+      shell: docker swarm init --advertise-addr={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+      
+    - name: Retrieve token
+      shell: docker swarm join-token -q worker
+      register: worker_token
+
+- hosts: opiesz_workers
+  become: true
+  vars:
+    token: "{{ hostvars[groups['opiesz_manager'][0]]['worker_token']['stdout'] }}"
+  tasks:
+    - name: Join workers
+      shell: docker swarm join --token {{ token }} {{ hostvars[groups['opiesz_manager'][0]]['ansible_default_ipv4']['address'] }}

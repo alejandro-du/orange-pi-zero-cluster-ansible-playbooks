@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  primary:
+    image: alejandrodu/mariadb-primary
+    ports:
+      - "3306:3306"
+    volumes:
+      - ${PWD}/mariadb-data:/var/lib/mysql
+
+  replica1:
+    image: alejandrodu/mariadb-replica
+    environment:
+      MARIADB_PRIMARY_HOST: 192.168.1.181
+    ports:
+      - "3307:3306"
+    volumes:
+      - ${PWD}/mariadb-data:/var/lib/mysql
+
+  replica2:
+    image: alejandrodu/mariadb-replica
+    environment:
+      MARIADB_PRIMARY_HOST: 192.168.1.181
+    ports:
+      - "3308:3306"
+    volumes:
+      - ${PWD}/mariadb-data:/var/lib/mysql
+
+  maxscale:
+    image: alejandrodu/mariadb-maxscale
+    command: --admin_host 0.0.0.0 --admin_secure_gui false
+    depends_on:
+      - primary
+      - replica1
+      - replica2
+    ports:
+      - "4000:4000"
+      - "8989:8989"
+      - "27017:27017"
+    volumes:
+      - ${PWD}/maxscale-data:/var/lib/maxscale
+    environment:
+      MARIADB_HOST_1: 192.168.1.181 3306
+      MARIADB_HOST_2: 192.168.1.181 3307
+      MARIADB_HOST_3: 192.168.1.181 3308

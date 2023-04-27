@@ -4,6 +4,9 @@
     - name: Configure LED activity
       shell: sed '$iecho mmc0> /sys/class/leds/orangepi\\:red\\:power/trigger' /etc/rc.local > temp && mv temp /etc/rc.local && chmod +x /etc/rc.local
 
+    - name: Set CPU max speed
+      shell: sed -i "s/MAX_SPEED=.*/MAX_SPEED=1008000/" /etc/default/cpufrequtils && systemctl restart cpufrequtils
+
     - name: Set hostname
       shell: hostnamectl set-hostname {{ hostname }}
       

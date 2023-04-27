@@ -6,6 +6,7 @@ services:
       - "3306:3306"
     volumes:
       - ${PWD}/mariadb-data:/var/lib/mysql
+      - ${PWD}/files:/root
 
   replica1:
     image: alejandrodu/mariadb-replica
@@ -15,6 +16,7 @@ services:
       - "3307:3306"
     volumes:
       - ${PWD}/mariadb-data:/var/lib/mysql
+      - ${PWD}/files:/root
 
   replica2:
     image: alejandrodu/mariadb-replica
@@ -24,6 +26,7 @@ services:
       - "3308:3306"
     volumes:
       - ${PWD}/mariadb-data:/var/lib/mysql
+      - ${PWD}/files:/root
 
   maxscale:
     image: alejandrodu/mariadb-maxscale

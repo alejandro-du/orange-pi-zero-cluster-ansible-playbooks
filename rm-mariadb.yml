@@ -1,0 +1,12 @@
+- name: Undeploy MariaDB stack
+  hosts: opiesz_manager
+  tasks:
+    - name: Remove MariaDB stack
+      shell: docker stack rm mariadb
+
+- name: Delete files
+  hosts: opiesz
+  become: true
+  tasks:
+    - name: Delete data and files directories
+      shell: rm -rf /home/orangepi/mariadb-data/ /home/orangepi/maxscale-data/ /home/orangepi/files/

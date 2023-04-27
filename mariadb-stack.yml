@@ -1,0 +1,17 @@
+- name: Configure
+  hosts: opiesz
+  tasks:
+    - name: Create directories
+      shell: mkdir /home/orangepi/mariadb-data /home/orangepi/maxscale-data /home/orangepi/files
+    - name: Set permissions
+      shell: chmod -R ugo+rw /home/orangepi/mariadb-data /home/orangepi/maxscale-data /home/orangepi/files
+
+- name: Deploy MariaDB
+  hosts: opiesz_manager
+  tasks:
+    - name: Copy MariaDB Docker compose file
+      copy:
+        src: docker-swarm-stacks/mariadb-replication-stack.yml
+        dest: /home/orangepi/files/mariadb-replication-stack.yml
+    - name: Deploy MariaDB stack
+      shell: docker stack deploy -c files/mariadb-replication-stack.yml mariadb

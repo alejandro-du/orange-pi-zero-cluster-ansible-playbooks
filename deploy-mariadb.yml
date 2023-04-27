@@ -3,7 +3,7 @@
   tasks:
     - name: Copy MariaDB compose file
       copy:
-        src: mariadb-replication-stack.yml
+        src: docker-swarm-stacks/mariadb-replication-stack.yml
         dest: /home/orangepi/
     - name: Deploy MariaDB stack
       shell: docker stack deploy -c mariadb-replication-stack.yml mariadb

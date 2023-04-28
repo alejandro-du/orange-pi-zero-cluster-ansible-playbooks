@@ -37,7 +37,11 @@ Change the target group name (the default is `opiesz`) in the **.yml** files bef
 * **reboot.yml**: Reboots all the nodes
 * **shutdown.yml**: Shuts down all the nodes
 * **temperature.yml**: Prints the temperature of each machine
+* **docker.yml**: Installs Docker
+* **docker-swarm.yml**: Creates a docker swarm
 
 ## Deploying MariaDB
+
+* **mariadb-stack**: Deploys a MariaDB replication topology with MaxScale
 
 See https://github.com/alejandro-du/mariadb-docker-deployments/tree/armv7

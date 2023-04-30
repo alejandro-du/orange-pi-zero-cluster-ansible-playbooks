@@ -12,6 +12,7 @@ Install Ansible on a control node and define an inventory (**/etc/ansible/hosts*
 192.168.1.102		ansible_user=orangepi		hostname=ozpi02
 192.168.1.103		ansible_user=orangepi		hostname=ozpi03
 192.168.1.104		ansible_user=orangepi		hostname=ozpi04
+```
 
 Run a playbook as follows:
 

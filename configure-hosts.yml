@@ -1,7 +1,10 @@
 - hosts: opiesz
   become: true
   tasks:
-    - name: Configure LED activity
+    - name: Configure green LED activity
+      shell: sed '$iecho mmc1> /sys/class/leds/orangepi\\:green\\:status/trigger' /etc/rc.local > temp && mv temp /etc/rc.local && chmod +x /etc/rc.local
+
+    - name: Configure red LED activity
       shell: sed '$iecho mmc0> /sys/class/leds/orangepi\\:red\\:power/trigger' /etc/rc.local > temp && mv temp /etc/rc.local && chmod +x /etc/rc.local
 
     - name: Set hostname

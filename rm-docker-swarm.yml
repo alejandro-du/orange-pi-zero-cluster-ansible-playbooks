@@ -1,10 +1,10 @@
-- hosts: opiesz_workers
+- hosts: opies_workers
   become: true
   tasks:
     - name: Leave swarm (workers)
       shell: docker swarm leave
 
-- hosts: opiesz_manager
+- hosts: opies_manager
   become: true
   tasks:
     - name: Leave swarm (manager)

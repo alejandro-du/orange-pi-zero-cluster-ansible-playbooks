@@ -11,7 +11,7 @@ services:
   replica1:
     image: alejandrodu/mariadb-replica
     environment:
-      MARIADB_PRIMARY_HOST: 192.168.1.181
+      MARIADB_PRIMARY_HOST: 192.168.1.161
     ports:
       - "3307:3306"
     volumes:
@@ -21,7 +21,7 @@ services:
   replica2:
     image: alejandrodu/mariadb-replica
     environment:
-      MARIADB_PRIMARY_HOST: 192.168.1.181
+      MARIADB_PRIMARY_HOST: 192.168.1.161
     ports:
       - "3308:3306"
     volumes:
@@ -42,6 +42,6 @@ services:
     volumes:
       - ${PWD}/maxscale-data:/var/lib/maxscale
     environment:
-      MARIADB_HOST_1: 192.168.1.181 3306
-      MARIADB_HOST_2: 192.168.1.181 3307
-      MARIADB_HOST_3: 192.168.1.181 3308
+      MARIADB_HOST_1: 192.168.1.161 3306
+      MARIADB_HOST_2: 192.168.1.161 3307
+      MARIADB_HOST_3: 192.168.1.161 3308

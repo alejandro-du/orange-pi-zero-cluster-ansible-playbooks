@@ -1,5 +1,5 @@
 - name: Shutdown nodes
-  hosts: opiesz
+  hosts: opies
   gather_facts: no
   tasks:
     - name: Shutdown

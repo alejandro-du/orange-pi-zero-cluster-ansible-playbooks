@@ -1,5 +1,5 @@
 - name: Checks the temperature of each node
-  hosts: opiesz
+  hosts: opies
   gather_facts: no
   tasks:
     - name: Print temperature

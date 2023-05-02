@@ -1,17 +1,17 @@
-# Ansible playbooks to manage Orange Pi Zero 2 clusters
+# Ansible playbooks to manage Orange Pi 3 LTS clusters
 
-This repository contains a set of Ansible playbooks that help to set up and manage an Orange Pi Zero 2 cluster.
+This repository contains a set of Ansible playbooks that help to set up and manage an Orange Pi 3 LTS cluster.
 
 ## How to run?
 
 Install Ansible on a control node and define an inventory (**/etc/ansible/hosts**). For example:
 
 ```
-[opiesz]
-192.168.1.101		ansible_user=orangepi		hostname=ozpi01
-192.168.1.102		ansible_user=orangepi		hostname=ozpi02
-192.168.1.103		ansible_user=orangepi		hostname=ozpi03
-192.168.1.104		ansible_user=orangepi		hostname=ozpi04
+[opies]
+192.168.1.101		ansible_user=orangepi		hostname=opi01
+192.168.1.102		ansible_user=orangepi		hostname=opi02
+192.168.1.103		ansible_user=orangepi		hostname=opi03
+192.168.1.104		ansible_user=orangepi		hostname=opi04
 ```
 
 Run a playbook as follows:
@@ -28,7 +28,7 @@ ansible-playbook some-playbook.yml --ask-pass --ask-become-pass
 
 ## Configuring
 
-Change the target group name (the default is `opiesz`) in the **.yml** files before running a playbook if needed.
+Change the target group name (the default is `opies`) in the **.yml** files before running a playbook if needed.
 
 ## Available playbooks
 

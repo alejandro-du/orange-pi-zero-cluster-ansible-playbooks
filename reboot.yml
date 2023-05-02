@@ -1,5 +1,5 @@
 - name: Reboot nodes
-  hosts: opiesz
+  hosts: opies
   tasks:
     - name: Reboot
       become: yes

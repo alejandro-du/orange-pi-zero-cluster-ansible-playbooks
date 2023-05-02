@@ -1,4 +1,4 @@
-- hosts: opiesz
+- hosts: opies
   become: true
   tasks:
     - name: Switch to iptables for nat
@@ -8,9 +8,13 @@
       shell: echo 'extraargs="systemd.unified_cgroup_hierarchy=0"' >> /boot/armbianEnv.txt
 
     - name: Switch to iptables for nat (ip6)
-      shell: sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+      shell: update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
     - name: Install Docker
       apt:
         pkg:
+          - apparmor
           - docker.io
+
+    - name: Disable apparmor
+      shell: systemctl stop apparmor; systemctl disable apparmor

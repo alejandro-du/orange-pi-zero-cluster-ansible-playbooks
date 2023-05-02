@@ -1,4 +1,4 @@
-- hosts: opiesz_manager
+- hosts: opies_manager
   become: true
   tasks:
     - name: Init swarm cluster
@@ -8,10 +8,10 @@
       shell: docker swarm join-token -q worker
       register: worker_token
 
-- hosts: opiesz_workers
+- hosts: opies_workers
   become: true
   vars:
-    token: "{{ hostvars[groups['opiesz_manager'][0]]['worker_token']['stdout'] }}"
+    token: "{{ hostvars[groups['opies_manager'][0]]['worker_token']['stdout'] }}"
   tasks:
     - name: Join workers
-      shell: docker swarm join --token {{ token }} {{ hostvars[groups['opiesz_manager'][0]]['ansible_default_ipv4']['address'] }}
+      shell: docker swarm join --token {{ token }} {{ hostvars[groups['opies_manager'][0]]['ansible_default_ipv4']['address'] }}

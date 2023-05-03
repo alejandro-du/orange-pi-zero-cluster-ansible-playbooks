@@ -2,9 +2,9 @@
   hosts: opiesz
   tasks:
     - name: Create directories
-      shell: mkdir /home/orangepi/mariadb-primary-data /home/orangepi/mariadb-replica1-data /home/orangepi/mariadb-replica2-data /home/orangepi/maxscale-data /home/orangepi/files
+      shell: mkdir /home/orangepi/mariadb-1-data /home/orangepi/mariadb-2-data /home/orangepi/mariadb-3-data /home/orangepi/maxscale-data /home/orangepi/files
     - name: Set permissions
-      shell: chmod -R ugo+rw /home/orangepi/mariadb-primary-data /home/orangepi/mariadb-replica1-data /home/orangepi/mariadb-replica2-data /home/orangepi/maxscale-data /home/orangepi/files
+      shell: chmod -R ugo+rw /home/orangepi/mariadb-1-data /home/orangepi/mariadb-2-data /home/orangepi/mariadb-3-data /home/orangepi/maxscale-data /home/orangepi/files
 
 - name: Deploy MariaDB
   hosts: opiesz_manager

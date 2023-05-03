@@ -9,4 +9,4 @@
   become: true
   tasks:
     - name: Delete data and files directories
-      shell: rm -rf /home/orangepi/mariadb-primary-data/ /home/orangepi/mariadb-replica-data/ /home/orangepi/maxscale-data/ /home/orangepi/files/
+      shell: rm -rf /home/orangepi/mariadb-1-data/ /home/orangepi/mariadb-2-data/ /home/orangepi/mariadb-3-data/ /home/orangepi/maxscale-data/ /home/orangepi/files/

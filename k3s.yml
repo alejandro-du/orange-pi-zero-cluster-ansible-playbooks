@@ -1,0 +1,35 @@
+- hosts: opies
+  become: yes
+  tasks:
+    - name: Install K3s on the master node
+      shell: |
+        curl -sfL https://get.k3s.io | sh -s - server --cluster-init
+      when: master is defined and master
+
+    - name: Get master IP address
+      set_fact:
+        master_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+      when: master is defined and master
+      delegate_to: "{{ inventory_hostname }}"
+      run_once: true
+
+    - name: Get K3s token from master
+      shell: cat /var/lib/rancher/k3s/server/node-token
+      register: k3s_token
+      delegate_to: "{{ master_ip }}"
+      run_once: true
+
+    - name: Install K3s on worker nodes
+      shell: |
+        curl -sfL https://get.k3s.io | K3S_URL=https://{{ master_ip }}:6443 K3S_TOKEN={{ k3s_token.stdout }} sh -
+      when: master is not defined or not master
+
+- hosts: 192.168.1.161
+  become: yes
+  tasks:
+    - name: Verify K3s installation on master node
+      shell: kubectl get nodes
+      register: result
+      ignore_errors: yes
+
+    - debug: var=result.stdout_lines

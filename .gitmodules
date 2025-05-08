@@ -1,0 +1,3 @@
+[submodule "k8s-deployments"]
+	path = k8s-deployments
+	url = https://github.com/mariadb-operator/mariadb-operator.git

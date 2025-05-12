@@ -3,33 +3,59 @@
   tasks:
     - name: Install K3s on the master node
       shell: |
-        curl -sfL https://get.k3s.io | sh -s - server --cluster-init
-      when: master is defined and master
+        curl -sfL https://get.k3s.io | \
+        INSTALL_K3S_EXEC="--disable traefik \
+                          --disable servicelb \
+                          --disable cloud-controller \
+                          --disable network-policy" \
+        sh -s - server --cluster-init
+      when: master | default(false)
 
-    - name: Get master IP address
+    - name: Set master_ip fact
       set_fact:
-        master_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-      when: master is defined and master
-      delegate_to: "{{ inventory_hostname }}"
+        master_ip: "{{ hostvars[item]['ansible_default_ipv4']['address'] }}"
+        cacheable: true
       run_once: true
+      with_items: "{{ groups['opies'] }}"
+      when: hostvars[item]['master'] | default(false)
 
     - name: Get K3s token from master
       shell: cat /var/lib/rancher/k3s/server/node-token
-      register: k3s_token
-      delegate_to: "{{ master_ip }}"
+      register: k3s_token_result
+      delegate_to: "{{ item }}"
+      run_once: true
+      with_items: "{{ groups['opies'] }}"
+      when: hostvars[item]['master'] | default(false)
+
+    - name: Set k3s_token fact
+      set_fact:
+        k3s_token: "{{ k3s_token_result.results[0].stdout }}"
+        cacheable: true
       run_once: true
 
-    - name: Install K3s on worker nodes
-      shell: |
-        curl -sfL https://get.k3s.io | K3S_URL=https://{{ master_ip }}:6443 K3S_TOKEN={{ k3s_token.stdout }} sh -
-      when: master is not defined or not master
-
-- hosts: 192.168.1.161
+- hosts: opies
   become: yes
   tasks:
-    - name: Verify K3s installation on master node
-      shell: kubectl get nodes
-      register: result
-      ignore_errors: yes
+    - name: Install K3s on worker nodes
+      shell: |
+        curl -sfL https://get.k3s.io | \
+        K3S_URL=https://{{ master_ip }}:6443 \
+        K3S_TOKEN={{ k3s_token }} sh -
+      when: master is not defined or not master
 
-    - debug: var=result.stdout_lines
+- hosts: opies
+  become: yes
+  tasks:
+    - name: Wait for server to start
+      shell: "sleep 10"
+      when: master | default(false)
+
+    - name: Verify K3s installation
+      shell: KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl get nodes
+      register: result
+      ignore_errors: true
+      when: master | default(false)
+
+    - debug:
+        var: result.stdout_lines
+      when: master | default(false)

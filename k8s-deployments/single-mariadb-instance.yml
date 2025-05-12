@@ -1,0 +1,48 @@
+# 1. Root password secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mariadb-root-password
+type: Opaque
+stringData:
+  password: demo123
+---
+# 2. MariaDB instance
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: mariadb-demo
+spec:
+  rootPasswordSecretKeyRef:
+    name: mariadb-root-password
+    key: password
+  storage:
+    size: 100Mi
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 300m
+  myCnf: |
+    [mariadb]
+    bind-address=0.0.0.0
+    skip-log-bin
+    innodb_buffer_pool_size=64M
+    max_connections=20
+---
+# 3. NodePort service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-demo-external
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: mariadb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+      nodePort: 30001

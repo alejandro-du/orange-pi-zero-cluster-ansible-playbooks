@@ -5,6 +5,11 @@
       shell: /usr/local/bin/k3s-uninstall.sh || true
       ignore_errors: yes
 
+    - name: Unmount /var/lib/kubelet submounts
+      shell: |
+        mount | grep /var/lib/kubelet | awk '{print $3}' | sort -r | xargs -r umount
+      ignore_errors: yes
+
     - name: Remove leftover directories
       file:
         path: "{{ item }}"

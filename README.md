@@ -8,7 +8,7 @@ Install Ansible on a control node and define an inventory (**/etc/ansible/hosts*
 
 ```
 [opiesz]
-192.168.1.101		ansible_user=orangepi		hostname=ozpi01
+192.168.1.101		ansible_user=orangepi		hostname=ozpi01	master=true
 192.168.1.102		ansible_user=orangepi		hostname=ozpi02
 192.168.1.103		ansible_user=orangepi		hostname=ozpi03
 192.168.1.104		ansible_user=orangepi		hostname=ozpi04
@@ -51,7 +51,9 @@ See https://github.com/alejandro-du/mariadb-docker-deployments/tree/armv7
 
 ## Deploying MariaDB on Kubernetes (K3s)
 
-### Single node
+### Deploy Single node
+
+You can deploy a single MariaDB server as follows:
 
 ```sh
 kubectl apply -f k8s-deployments/single-mariadb-instance.yml
@@ -59,18 +61,16 @@ kubectl apply -f k8s-deployments/single-mariadb-instance.yml
 
 ### 3-node Galera cluster
 
+You can deploy a 3-node Galera multi-master cluster (using Galera) as follows:
+
 ```sh
 kubectl apply -f k8s-deployments/mariadb-galera-cluster.yml
 ```
 
-Fix permissions (I haven't been able to automate this part just yet):
+### Connect to the database
+
+After a successful deployment, test the connection as follows (use the IP address of any of your Orange Pies):
 
 ```sh
-kubectl exec -it mariadb-galera-2 -c mariadb -- bash
-
-mariadb --user=root --skip-password
-
-
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'demo123';
-ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY 'demo123';
-```
+mariadb -h 192.168.1.101 --port 30001 -u root -pdemo123
+````

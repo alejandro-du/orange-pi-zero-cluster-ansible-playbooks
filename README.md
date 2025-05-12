@@ -39,10 +39,38 @@ Change the target group name (the default is `opiesz`) in the **.yml** files bef
 * **shutdown.yml**: Shuts down all the nodes
 * **temperature.yml**: Prints the temperature of each machine
 * **docker.yml**: Installs Docker
-* **docker-swarm.yml**: Creates a docker swarm
+* **docker-swarm.yml**: Creates a Docker Swarm cluster
+* **k3s.yml**: Creates a Kubernetes cluster (K3s)
+* **Mariadb-k8s-operator.yml**: Installs the MariaDB Kubernetes Operator
 
-## Deploying MariaDB
+## Deploying MariaDB using Docker Swarm
 
 * **mariadb-stack**: Deploys a MariaDB replication topology with MaxScale
 
 See https://github.com/alejandro-du/mariadb-docker-deployments/tree/armv7
+
+## Deploying MariaDB on Kubernetes (K3s)
+
+### Single node
+
+```sh
+kubectl apply -f k8s-deployments/single-mariadb-instance.yml
+```
+
+### 3-node Galera cluster
+
+```sh
+kubectl apply -f k8s-deployments/mariadb-galera-cluster.yml
+```
+
+Fix permissions (I haven't been able to automate this part just yet):
+
+```sh
+kubectl exec -it mariadb-galera-2 -c mariadb -- bash
+
+mariadb --user=root --skip-password
+
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'demo123';
+ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY 'demo123';
+```

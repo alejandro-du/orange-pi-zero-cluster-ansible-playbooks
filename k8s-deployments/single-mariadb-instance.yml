@@ -18,6 +18,7 @@ spec:
     key: password
   storage:
     size: 100Mi
+    storageClassName: local-path
   resources:
     requests:
       memory: 128Mi
@@ -31,6 +32,16 @@ spec:
     skip-log-bin
     innodb_buffer_pool_size=64M
     max_connections=20
+  livenessProbe:
+    periodSeconds: 90
+    timeoutSeconds: 60
+  readinessProbe:
+    periodSeconds: 60
+    timeoutSeconds: 60
+  startupProbe:
+    failureThreshold: 90
+    periodSeconds: 60
+    timeoutSeconds: 60
 ---
 # 3. NodePort service
 apiVersion: v1

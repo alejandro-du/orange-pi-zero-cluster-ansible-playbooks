@@ -1,4 +1,4 @@
-- hosts: opiesz
+- hosts: opies
   become: true
   tasks:
     - name: Switch to iptables for nat

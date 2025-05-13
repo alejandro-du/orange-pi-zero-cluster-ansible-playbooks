@@ -7,7 +7,7 @@ This repository contains a set of Ansible playbooks that help to set up and mana
 Install Ansible on a control node and define an inventory (**/etc/ansible/hosts**). For example:
 
 ```
-[opiesz]
+[opies]
 192.168.1.101		ansible_user=orangepi		hostname=ozpi01	master=true
 192.168.1.102		ansible_user=orangepi		hostname=ozpi02
 192.168.1.103		ansible_user=orangepi		hostname=ozpi03
@@ -28,7 +28,7 @@ ansible-playbook some-playbook.yml --ask-pass --ask-become-pass
 
 ## Configuring
 
-Change the target group name (the default is `opiesz`) in the **.yml** files before running a playbook if needed.
+Change the target group name (the default is `opies`) in the **.yml** files before running a playbook if needed.
 
 ## Available playbooks
 

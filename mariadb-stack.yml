@@ -1,5 +1,5 @@
 - name: Configure
-  hosts: opiesz
+  hosts: opies
   tasks:
     - name: Create directories
       shell: mkdir /home/orangepi/mariadb-1-data /home/orangepi/mariadb-2-data /home/orangepi/mariadb-3-data /home/orangepi/maxscale-data /home/orangepi/files
@@ -7,7 +7,7 @@
       shell: chmod -R ugo+rw /home/orangepi/mariadb-1-data /home/orangepi/mariadb-2-data /home/orangepi/mariadb-3-data /home/orangepi/maxscale-data /home/orangepi/files
 
 - name: Deploy MariaDB
-  hosts: opiesz_manager
+  hosts: opies_manager
   tasks:
     - name: Copy MariaDB Docker compose file
       copy:

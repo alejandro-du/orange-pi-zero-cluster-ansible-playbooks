@@ -1,5 +1,5 @@
 - name: Updates and upgrades the nodes
-  hosts: opiesz
+  hosts: opies
   tasks:
     - name: Update package lists
       become: yes

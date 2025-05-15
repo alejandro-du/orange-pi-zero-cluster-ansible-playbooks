@@ -1,11 +1,3 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: root-password
-type: Opaque
-stringData:
-  password: demo123
----
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: MariaDB
 metadata:
@@ -22,11 +14,11 @@ spec:
     storageClassName: local-path
   resources:
     requests:
-      memory: 256Mi
-      cpu: 100m
-    limits:
       memory: 512Mi
-      cpu: 300m
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 1500m
   galera:
     enabled: true
     sst: mariabackup
@@ -41,17 +33,17 @@ spec:
     wsrep_sst_auth=root:demo123
     wsrep_provider_options=gcache.size=128M; gcache.page_size=128M
   startupProbe:
-    failureThreshold: 10
-    periodSeconds: 30
-    timeoutSeconds: 15
+    failureThreshold: 40         # 40 * 15s = 10 minutes grace
+    periodSeconds: 15            # check every 15 seconds
+    timeoutSeconds: 10           # each check can take up to 10s
   livenessProbe:
-    failureThreshold: 3
-    periodSeconds: 60
-    timeoutSeconds: 20
+    failureThreshold: 10         # 10 * 60s = 10 minutes of failing allowed
+    periodSeconds: 60            # check every 60 seconds
+    timeoutSeconds: 10           # each check can take 10s
   readinessProbe:
-    failureThreshold: 3
-    periodSeconds: 30
-    timeoutSeconds: 10
+    failureThreshold: 10         # 10 * 30s = 5 minutes tolerance
+    periodSeconds: 30            # check every 30 seconds
+    timeoutSeconds: 5            # fast readiness check
 ---
 apiVersion: v1
 kind: Service

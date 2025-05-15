@@ -1,13 +1,4 @@
-# 1. Root password secret
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mariadb-root-password
-type: Opaque
-stringData:
-  password: demo123
----
-# 2. MariaDB instance
+# MariaDB instance
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: MariaDB
 metadata:
@@ -33,19 +24,19 @@ spec:
     innodb_buffer_pool_size=64M
     max_connections=20
   startupProbe:
-    failureThreshold: 10
-    periodSeconds: 30
-    timeoutSeconds: 15
+    failureThreshold: 40         # 40 * 15s = 10 minutes grace
+    periodSeconds: 15            # check every 15 seconds
+    timeoutSeconds: 10           # each check can take up to 10s
   livenessProbe:
-    failureThreshold: 3
-    periodSeconds: 60
-    timeoutSeconds: 20
+    failureThreshold: 10         # 10 * 60s = 10 minutes of failing allowed
+    periodSeconds: 60            # check every 60 seconds
+    timeoutSeconds: 10           # each check can take 10s
   readinessProbe:
-    failureThreshold: 3
-    periodSeconds: 30
-    timeoutSeconds: 10
+    failureThreshold: 10         # 10 * 30s = 5 minutes tolerance
+    periodSeconds: 30            # check every 30 seconds
+    timeoutSeconds: 5            # fast readiness check
 ---
-# 3. NodePort service
+# NodePort service
 apiVersion: v1
 kind: Service
 metadata:

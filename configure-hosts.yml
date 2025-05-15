@@ -1,17 +1,64 @@
 - hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: true
   tasks:
-    - name: Configure green LED activity
-      shell: sed '$iecho mmc1> /sys/class/leds/orangepi\\:green\\:status/trigger' /etc/rc.local > temp && mv temp /etc/rc.local && chmod +x /etc/rc.local
 
-    - name: Configure red LED activity
-      shell: sed '$iecho mmc0> /sys/class/leds/orangepi\\:red\\:power/trigger' /etc/rc.local > temp && mv temp /etc/rc.local && chmod +x /etc/rc.local
+    - name: Install cpufrequtils
+      apt:
+        name: cpufrequtils
+        state: present
+        update_cache: yes
 
     - name: Set CPU max speed
-      shell: sed -i "s/MAX_SPEED=.*/MAX_SPEED=1008000/" /etc/default/cpufrequtils && systemctl restart cpufrequtils
+      lineinfile:
+        path: /etc/default/cpufrequtils
+        regexp: '^MAX_SPEED='
+        line: 'MAX_SPEED=1008000'
+      notify: restart cpufrequtils
 
     - name: Set hostname
-      shell: hostnamectl set-hostname {{ hostname }}
+      command: hostnamectl set-hostname {{ hostname }}
 
-    - name: Install Avahi
-      shell: apt-get install avahi-daemon -y
+    - name: Install Avahi daemon
+      apt:
+        name: avahi-daemon
+        state: present
+        update_cache: yes
+
+    - name: Create LED config script
+      copy:
+        dest: /usr/local/bin/set-leds.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          echo activity > /sys/class/leds/green:power/trigger
+          echo mmc0 > /sys/class/leds/red:status/trigger
+
+    - name: Create systemd service for LED setup
+      copy:
+        dest: /etc/systemd/system/leds-setup.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Configure onboard LED triggers
+          After=multi-user.target
+          ConditionPathExists=/usr/local/bin/set-leds.sh
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/bin/set-leds.sh
+          RemainAfterExit=true
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Enable and start LED setup service
+      systemd:
+        name: leds-setup.service
+        enabled: true
+        state: started
+
+  handlers:
+    - name: restart cpufrequtils
+      systemd:
+        name: cpufrequtils
+        state: restarted

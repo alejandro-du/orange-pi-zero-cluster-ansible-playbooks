@@ -16,7 +16,7 @@
         master_ip: "{{ hostvars[item]['ansible_default_ipv4']['address'] }}"
         cacheable: true
       run_once: true
-      with_items: "{{ groups['opies'] }}"
+      with_items: "{{ groups[lookup('env', 'TARGET_GROUP_NAME') | default('opies', true)] }}"
       when: hostvars[item]['master'] | default(false)
 
     - name: Get K3s token from master
@@ -24,7 +24,7 @@
       register: k3s_token_result
       delegate_to: "{{ item }}"
       run_once: true
-      with_items: "{{ groups['opies'] }}"
+      with_items: "{{ groups[lookup('env', 'TARGET_GROUP_NAME') | default('opies', true)] }}"
       when: hostvars[item]['master'] | default(false)
 
     - name: Set k3s_token fact

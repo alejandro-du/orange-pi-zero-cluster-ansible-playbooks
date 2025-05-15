@@ -1,5 +1,4 @@
----
-- hosts: 192.168.1.161
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: yes
   gather_facts: no
   tasks:
@@ -8,18 +7,22 @@
         name: helm
         state: present
         update_cache: yes
+      when: master | default(false)
 
     - name: Add MariaDB Operator Helm repository
       shell: helm repo add mariadb-operator https://helm.mariadb.com/mariadb-operator
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      when: master | default(false)
 
     - name: Install MariaDB Operator CRDs
       shell: helm install mariadb-operator-crds mariadb-operator/mariadb-operator-crds
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      when: master | default(false)
 
     - name: Install MariaDB Operator
       shell: helm install mariadb-operator mariadb-operator/mariadb-operator
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      when: master | default(false)

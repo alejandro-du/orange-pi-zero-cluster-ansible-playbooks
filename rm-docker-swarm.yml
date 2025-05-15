@@ -1,10 +1,10 @@
-- hosts: opies_workers
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"_workers
   become: true
   tasks:
     - name: Leave swarm (workers)
       shell: docker swarm leave
 
-- hosts: opies_manager
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"_manager
   become: true
   tasks:
     - name: Leave swarm (manager)

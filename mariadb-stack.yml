@@ -1,5 +1,5 @@
 - name: Configure
-  hosts: opies
+  hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   tasks:
     - name: Create directories
       shell: mkdir /home/orangepi/mariadb-1-data /home/orangepi/mariadb-2-data /home/orangepi/mariadb-3-data /home/orangepi/maxscale-data /home/orangepi/files
@@ -7,7 +7,7 @@
       shell: chmod -R ugo+rw /home/orangepi/mariadb-1-data /home/orangepi/mariadb-2-data /home/orangepi/mariadb-3-data /home/orangepi/maxscale-data /home/orangepi/files
 
 - name: Deploy MariaDB
-  hosts: opies_manager
+  hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"_manager
   tasks:
     - name: Copy MariaDB Docker compose file
       copy:

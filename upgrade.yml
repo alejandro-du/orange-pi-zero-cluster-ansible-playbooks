@@ -1,5 +1,5 @@
 - name: Updates and upgrades the nodes
-  hosts: opies
+  hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   tasks:
     - name: Update package lists
       become: yes

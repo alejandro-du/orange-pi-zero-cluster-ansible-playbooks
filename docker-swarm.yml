@@ -1,4 +1,4 @@
-- hosts: opies_manager
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"_manager
   become: true
   tasks:
     - name: Init swarm cluster
@@ -8,7 +8,7 @@
       shell: docker swarm join-token -q worker
       register: worker_token
 
-- hosts: opies_workers
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"_workers
   become: true
   vars:
     token: "{{ hostvars[groups['opies_manager'][0]]['worker_token']['stdout'] }}"

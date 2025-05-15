@@ -1,4 +1,4 @@
-- hosts: opies
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: yes
   tasks:
     - name: Install K3s on the master node
@@ -33,7 +33,7 @@
         cacheable: true
       run_once: true
 
-- hosts: opies
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: yes
   tasks:
     - name: Install K3s on worker nodes
@@ -43,7 +43,7 @@
         K3S_TOKEN={{ k3s_token }} sh -
       when: master is not defined or not master
 
-- hosts: opies
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: yes
   tasks:
     - name: Wait for server to start

@@ -1,5 +1,5 @@
 - name: Reboot nodes
-  hosts: opies
+  hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   tasks:
     - name: Reboot
       become: yes

@@ -1,4 +1,4 @@
-- hosts: opies
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: true
   tasks:
     - name: Switch to iptables for nat

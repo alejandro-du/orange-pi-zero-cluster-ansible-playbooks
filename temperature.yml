@@ -1,5 +1,5 @@
 - name: Checks the temperature of each node
-  hosts: opies
+  hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   gather_facts: no
   tasks:
     - name: Print temperature

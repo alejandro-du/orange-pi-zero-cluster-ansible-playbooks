@@ -1,11 +1,11 @@
 - name: Undeploy MariaDB stack
-  hosts: opies_manager
+  hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"_manager
   tasks:
     - name: Remove MariaDB stack
       shell: docker stack rm mariadb
 
 - name: Delete files
-  hosts: opies
+  hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: true
   tasks:
     - name: Delete data and files directories

@@ -68,7 +68,7 @@ sed -i -e 's/127.0.0.1/192.168.1.161/g' ~/.kube/config
 Take note of the password:
 
 ```sh
-kubectl create secret generic root-password --from-literal=password=demo123
+kubectl create secret generic mariadb-root-password --from-literal=password=demo123
 ```
 
 ### Deploy a single MariaDB node

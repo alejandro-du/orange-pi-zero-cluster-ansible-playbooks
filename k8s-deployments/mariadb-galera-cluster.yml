@@ -6,7 +6,7 @@ spec:
   replicas: 3
   replicasAllowEvenNumber: true
   rootPasswordSecretKeyRef:
-    name: root-password
+    name: mariadb-root-password
     key: password
     generate: false
   storage:
@@ -14,11 +14,9 @@ spec:
     storageClassName: local-path
   resources:
     requests:
-      memory: 512Mi
-      cpu: 500m
+      memory: 1Gi
     limits:
       memory: 1Gi
-      cpu: 1500m
   galera:
     enabled: true
     sst: mariabackup
@@ -28,10 +26,12 @@ spec:
     [mariadb]
     bind-address=0.0.0.0
     binlog_format=ROW
-    innodb_buffer_pool_size=64M
+    innodb_buffer_pool_size=700M
     max_connections=12
     wsrep_sst_auth=root:demo123
     wsrep_provider_options=gcache.size=128M; gcache.page_size=128M
+  affinity:
+    antiAffinityEnabled: true
   startupProbe:
     failureThreshold: 40         # 40 * 15s = 10 minutes grace
     periodSeconds: 15            # check every 15 seconds

@@ -12,14 +12,14 @@ spec:
     storageClassName: local-path
   resources:
     requests:
-      memory: 1Gi
+      memory: 512Mi
     limits:
-      memory: 1Gi
+      memory: 512Mi
   myCnf: |
     [mariadb]
     bind-address=0.0.0.0
     skip-log-bin
-    innodb_buffer_pool_size=700M
+    innodb_buffer_pool_size=358M
     max_connections=20
   startupProbe:
     failureThreshold: 40         # 40 * 15s = 10 minutes grace

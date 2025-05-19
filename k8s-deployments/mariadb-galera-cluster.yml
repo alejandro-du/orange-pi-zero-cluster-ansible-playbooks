@@ -22,14 +22,15 @@ spec:
     sst: mariabackup
     primary:
       podIndex: 0
+    providerOptions:
+        gcache.size: '64M'
+        gcache.page_size: '64M'
   myCnf: |
     [mariadb]
     bind-address=0.0.0.0
     binlog_format=ROW
     innodb_buffer_pool_size=700M
     max_connections=12
-    wsrep_sst_auth=root:demo123
-    wsrep_provider_options=gcache.size=128M; gcache.page_size=128M
   affinity:
     antiAffinityEnabled: true
   startupProbe:

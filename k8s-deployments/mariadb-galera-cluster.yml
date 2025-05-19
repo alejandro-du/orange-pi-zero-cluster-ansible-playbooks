@@ -1,61 +1,70 @@
+# 3-node multi-master MariaDB cluster
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: MariaDB
 metadata:
   name: mariadb-galera
 spec:
-  replicas: 3
-  replicasAllowEvenNumber: true
+  replicas: 3                   # Minimum number for a fault-tolerant Galera cluster (balanced for resource constraints)
+  replicasAllowEvenNumber: true # Allows cluster to continue if a node fails, even with even number of nodes
   rootPasswordSecretKeyRef:
-    name: mariadb-root-password
+    name: mariadb-root-password # References the password secret created with kubectl
     key: password
-    generate: false
+    generate: false             # Use existing secret instead of generating one
   storage:
-    size: 100Mi
+    size: 100Mi                 # Small storage size to accommodate limited SD card capacity on Raspberry Pi, Orange Pi, and others
     storageClassName: local-path
   resources:
     requests:
-      memory: 1Gi
+      memory: 1Gi               # Higher than single instance to accommodate Galera overhead
     limits:
-      memory: 1Gi
+      memory: 1Gi               # Strict limit prevents OOM issues on resource-constrained nodes
   galera:
-    enabled: true
-    sst: mariabackup
+    enabled: true               # Activates multi-master synchronous replication
+    sst: mariabackup            # State transfer method that's more efficient for limited bandwidth connections
     primary:
-      podIndex: 0
+      podIndex: 0               # First pod bootstraps the cluster
     providerOptions:
-        gcache.size: '64M'
-        gcache.page_size: '64M'
+        gcache.size: '64M'      # Reduced write-set cache for memory-constrained environment
+        gcache.page_size: '64M' # Matching page size improves memory efficiency
   myCnf: |
     [mariadb]
+    # Listen on all interfaces for cluster communication
     bind-address=0.0.0.0
+
+    # Required for Galera replication to work correctly
     binlog_format=ROW
+
+    # ~70% of available memory for database caching
     innodb_buffer_pool_size=700M
+
+    # Severely limited to prevent memory exhaustion across replicas
     max_connections=12
   affinity:
-    antiAffinityEnabled: true
+    antiAffinityEnabled: true   # Ensures pods run on different nodes for true high availability
   startupProbe:
-    failureThreshold: 40         # 40 * 15s = 10 minutes grace
-    periodSeconds: 15            # check every 15 seconds
-    timeoutSeconds: 10           # each check can take up to 10s
+    failureThreshold: 40# 40 * 15s = 10 minutes grace
+    periodSeconds: 15           # check every 15 seconds
+    timeoutSeconds: 10          # each check can take up to 10s
   livenessProbe:
-    failureThreshold: 10         # 10 * 60s = 10 minutes of failing allowed
-    periodSeconds: 60            # check every 60 seconds
-    timeoutSeconds: 10           # each check can take 10s
+    failureThreshold: 10        # 10 * 60s = 10 minutes of failing allowed
+    periodSeconds: 60           # check every 60 seconds
+    timeoutSeconds: 10          # each check can take 10s
   readinessProbe:
-    failureThreshold: 10         # 10 * 30s = 5 minutes tolerance
-    periodSeconds: 30            # check every 30 seconds
-    timeoutSeconds: 5            # fast readiness check
+    failureThreshold: 10        # 10 * 30s = 5 minutes tolerance
+    periodSeconds: 30           # check every 30 seconds
+    timeoutSeconds: 5           # fast readiness check
 ---
+# External access service
 apiVersion: v1
 kind: Service
 metadata:
   name: mariadb-galera-external
 spec:
-  type: NodePort
+  type: NodePort                    # Makes the database accessible from outside the cluster
   selector:
-    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/name: mariadb # Targets all MariaDB pods for load balancing
   ports:
     - protocol: TCP
-      port: 3306
-      targetPort: 3306
-      nodePort: 30001
+      port: 3306                    # Standard MariaDB port
+      targetPort: 3306              # Port inside the container
+      nodePort: 30001               # External access port on all cluster nodes (using any node IP)

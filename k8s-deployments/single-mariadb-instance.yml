@@ -4,35 +4,42 @@ kind: MariaDB
 metadata:
   name: mariadb-demo
 spec:
-  rootPasswordSecretKeyRef:
+  rootPasswordSecretKeyRef:       # Reference to a secret containing root password for security
     name: mariadb-root-password
     key: password
   storage:
-    size: 100Mi
-    storageClassName: local-path
+    size: 100Mi                   # Small storage size to conserve resources on limited-capacity SD cards
+    storageClassName: local-path  # Local storage class for simplicity and performance
   resources:
     requests:
-      memory: 512Mi
+      memory: 512Mi               # Minimum memory allocation - suitable for IoT/edge devices like Raspberry Pi, Orange Pi, and others
     limits:
-      memory: 512Mi
+      memory: 512Mi               # Hard limit prevents MariaDB from consuming too much memory on constrained devices
   myCnf: |
     [mariadb]
+    # Listen on all interfaces to allow external connections
     bind-address=0.0.0.0
+
+    # Disable binary logging to reduce disk I/O and storage requirements
     skip-log-bin
+
+    # Set to ~70% of available RAM to balance performance and memory usage
     innodb_buffer_pool_size=358M
+
+    # Limit connections to avoid memory exhaustion on constrained hardware
     max_connections=20
   startupProbe:
-    failureThreshold: 40         # 40 * 15s = 10 minutes grace
-    periodSeconds: 15            # check every 15 seconds
-    timeoutSeconds: 10           # each check can take up to 10s
+    failureThreshold: 40          # 40 * 15s = 10 minutes grace
+    periodSeconds: 15             # check every 15 seconds
+    timeoutSeconds: 10            # each check can take up to 10s
   livenessProbe:
-    failureThreshold: 10         # 10 * 60s = 10 minutes of failing allowed
-    periodSeconds: 60            # check every 60 seconds
-    timeoutSeconds: 10           # each check can take 10s
+    failureThreshold: 10          # 10 * 60s = 10 minutes of failing allowed
+    periodSeconds: 60             # check every 60 seconds
+    timeoutSeconds: 10            # each check can take 10s
   readinessProbe:
-    failureThreshold: 10         # 10 * 30s = 5 minutes tolerance
-    periodSeconds: 30            # check every 30 seconds
-    timeoutSeconds: 5            # fast readiness check
+    failureThreshold: 10          # 10 * 30s = 5 minutes tolerance
+    periodSeconds: 30             # check every 30 seconds
+    timeoutSeconds: 5             # fast readiness check
 ---
 # NodePort service
 apiVersion: v1
@@ -40,11 +47,11 @@ kind: Service
 metadata:
   name: mariadb-demo-external
 spec:
-  type: NodePort
+  type: NodePort                    # Makes the database accessible from outside the cluster
   selector:
-    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/name: mariadb # Targets the MariaDB pods created by operator
   ports:
     - protocol: TCP
-      port: 3306
-      targetPort: 3306
-      nodePort: 30001
+      port: 3306                    # Standard MariaDB port
+      targetPort: 3306              # Port inside the container
+      nodePort: 30001               # External access port on all nodes (limited to 30000-32767 range)

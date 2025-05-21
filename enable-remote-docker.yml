@@ -1,0 +1,26 @@
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
+  become: true
+  tasks:
+    - name: Create Docker daemon configuration directory
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: '0755'
+      when: master | default(false)
+
+    - name: Configure Docker daemon to allow remote connections
+      copy:
+        dest: /etc/systemd/system/docker.service.d/override.conf
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
+        mode: '0644'
+      when: master | default(false)
+
+    - name: Restart Docker service
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes
+      when: master | default(false)

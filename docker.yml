@@ -1,16 +1,49 @@
 - hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: true
   tasks:
+    - name: Check if iptables alternatives exist
+      command: update-alternatives --list iptables
+      register: iptables_check
+      failed_when: false
+      changed_when: false
+
     - name: Switch to iptables for nat
       shell: update-alternatives --set iptables /usr/sbin/iptables-legacy
+      when: iptables_check.rc == 0
+
+    - name: Check if cgroup parameter is already set
+      command: grep -q 'systemd.unified_cgroup_hierarchy=0' /boot/armbianEnv.txt
+      register: cgroup_check
+      failed_when: false
+      changed_when: false
 
     - name: Configure cgroup
       shell: echo 'extraargs="systemd.unified_cgroup_hierarchy=0"' >> /boot/armbianEnv.txt
+      when: cgroup_check.rc != 0
+      register: cgroup_configured
+
+    - name: Check if ip6tables alternatives exist
+      command: update-alternatives --list ip6tables
+      register: ip6tables_check
+      failed_when: false
+      changed_when: false
 
     - name: Switch to iptables for nat (ip6)
-      shell: sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+      shell: update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+      when: ip6tables_check.rc == 0
 
     - name: Install Docker
       apt:
         pkg:
           - docker.io
+        state: present
+        update_cache: yes
+
+    - name: Reboot if cgroup configuration changed
+      reboot:
+        msg: "Rebooting to apply cgroup changes"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+      when: cgroup_configured is defined and cgroup_configured.changed

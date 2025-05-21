@@ -1,17 +1,44 @@
-- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"_manager
+- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
   become: true
   tasks:
+    - name: Check if node is already in a swarm
+      shell: docker info --format {% raw %}'{{.Swarm.LocalNodeState}}'{% endraw %}
+      register: swarm_state
+      changed_when: false
+
     - name: Init swarm cluster
       shell: docker swarm init --advertise-addr={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+      when: master | default(false) and swarm_state.stdout != "active"
+
+    - name: Set master IP as a fact
+      set_fact:
+        master_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+      when: master | default(false)
+
+    - name: Share master IP with all hosts
+      set_fact:
+        master_ip: "{{ hostvars[item]['master_ip'] }}"
+      when: hostvars[item]['master'] | default(false)
+      with_items: "{{ ansible_play_hosts }}"
 
     - name: Retrieve token
       shell: docker swarm join-token -q worker
       register: worker_token
+      when: master | default(false)
+      changed_when: false
 
-- hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"_workers
-  become: true
-  vars:
-    token: "{{ hostvars[groups['opies_manager'][0]]['worker_token']['stdout'] }}"
-  tasks:
+    - name: Share token with all hosts
+      set_fact:
+        swarm_token: "{{ hostvars[item]['worker_token']['stdout'] }}"
+      when: hostvars[item]['master'] | default(false)
+      with_items: "{{ ansible_play_hosts }}"
+
+    - name: Check if worker is already in a swarm
+      shell: docker info --format {% raw %}'{{.Swarm.LocalNodeState}}'{% endraw %}
+      register: worker_swarm_state
+      changed_when: false
+      when: master is not defined or not master
+
     - name: Join workers
-      shell: docker swarm join --token {{ token }} {{ hostvars[groups['opies_manager'][0]]['ansible_default_ipv4']['address'] }}
+      shell: docker swarm join --token {{ swarm_token }} {{ master_ip }}
+      when: (master is not defined or not master) and worker_swarm_state.stdout != "active"

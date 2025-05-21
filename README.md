@@ -38,11 +38,33 @@ Change the target group name by setting the `TARGET_GROUP_NAME` environment vari
 * **reboot.yml**: Reboots all the nodes
 * **shutdown.yml**: Shuts down all the nodes
 * **temperature.yml**: Prints each node's temperature
-* **docker.yml**: Installs Docker
 
-## Deploying MariaDB using Docker Swarm
+## Setting up a Docker Swarm cluster
 
+* **docker.yml**: Configures the hosts for Docker and installs it
 * **docker-swarm.yml**: Creates a Docker Swarm cluster
+* **enable-remote-docker**: Allows you to control the cluster from your workstation/laptop
+
+To create a context for your remote Swarm, run:
+
+```sh
+docker context create orange-pi-swarm --docker "host=tcp://192.168.1.101:2375"
+```
+
+To use the remote context:
+
+```sh
+docker context use orange-pi-swarm
+```
+
+To switch back to your local Docker when needed:
+
+```sh
+docker context use default
+```
+
+### Deploying MariaDB with HA using Docker Swarm
+
 * **mariadb-stack**: Deploys a MariaDB replication topology with a [MaxScale proxy](https://mariadb.com/kb/en/maxscale/) in front
 
 See https://github.com/alejandro-du/mariadb-docker-deployments/tree/armv7

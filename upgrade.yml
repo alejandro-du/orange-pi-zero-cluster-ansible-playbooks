@@ -1,5 +1,7 @@
 - name: Updates and upgrades the nodes
   hosts: "{{ lookup('env', 'TARGET_GROUP_NAME') | default('opies', true) }}"
+  serial: 1
+  max_fail_percentage: 0          # Stop the entire play if even one host fails
   tasks:
     - name: Update package lists
       become: yes

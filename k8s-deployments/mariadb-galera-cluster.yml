@@ -42,7 +42,7 @@ spec:
   affinity:
     antiAffinityEnabled: true   # Ensures pods run on different nodes for true high availability
   startupProbe:
-    failureThreshold: 40# 40 * 15s = 10 minutes grace
+    failureThreshold: 40        # 40 * 15s = 10 minutes grace
     periodSeconds: 15           # check every 15 seconds
     timeoutSeconds: 10          # each check can take up to 10s
   livenessProbe:
